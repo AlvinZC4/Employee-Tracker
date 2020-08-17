@@ -1,7 +1,21 @@
 const inquirer = require("inquirer")
 const cTable = require("console.table")
+const { indexOf } = require("../Assets/pwd")
+
+
 
 const initApp = function(connection) {
+
+    const getDept = () => {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM department", function (err, res) {
+                if (err) reject(err)
+                resolve(res)
+            })
+        })
+
+        
+    }
     
     const topMenu = () => {
         inquirer.prompt([
@@ -26,6 +40,7 @@ const initApp = function(connection) {
                 connection.query("SELECT * FROM department", function (err, res) {
                     if (err) throw err
                     console.table(res)
+                    // console.log(res[0].name)
                     topMenu()
                 })
             }
@@ -62,6 +77,7 @@ const initApp = function(connection) {
     }
     const addDept = () => {
         console.log("Add a department")
+
         inquirer.prompt([
             {
                 type: "input",
@@ -76,8 +92,16 @@ const initApp = function(connection) {
             })
         })
     }
-    const addRole = () => {
+    const addRole = async() => {
         console.log("Add a role")
+
+        let depts = await getDept()
+        let deptNames = []
+        for (let i = 0; i < depts.length; i++) {
+            deptNames.push(depts[i].name)
+        }
+        // console.log("Getting Dept Names", deptNames)
+
         inquirer.prompt([
             {
                 type: "input",
@@ -90,12 +114,14 @@ const initApp = function(connection) {
                 message: "What will the salary of the new role be?"
             },
             {
-                type: "input",
+                type: "list",
                 name: "roleDept",
-                message: "Enter the Department ID of the department that this role will belong to"
+                message: "Select a department for this role",
+                choices: deptNames
             }
         ]).then(function(ans) {
-            connection.query("INSERT INTO role SET ?", {title: ans.roleTitle, salary: ans.roleSalary, department_id: ans.roleDept}, function(err, res) {
+            let arryIndex = deptNames.indexOf(ans.roleDept)
+            connection.query("INSERT INTO role SET ?", {title: ans.roleTitle, salary: ans.roleSalary, department_id: depts[arryIndex].id}, function(err, res) {
                 if (err) throw err
                 console.log(res.affectedRows + " roles inserted! \n")
                 topMenu()
