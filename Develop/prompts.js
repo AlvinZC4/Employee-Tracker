@@ -15,6 +15,7 @@ const initApp = function(connection) {
                     "View Roles",
                     "Add Role",
                     "View Employees",
+                    "Update employee role",
                     "Add Employee",
                     "Exit"
                 ]
@@ -50,6 +51,9 @@ const initApp = function(connection) {
             }
             else if (ans.menu === "Add Employee") {
                 addEmployee()
+            }
+            else if (ans.menu === "Update employee role") {
+                updateEmployee()
             }
             else if (ans.menu === "Exit") {
                 return
@@ -135,6 +139,42 @@ const initApp = function(connection) {
                 if (err) throw err
                 console.log(res.affectedRows + " employees inserted! \n")
                 topMenu()
+            })
+        })
+    }
+    const updateEmployee = () => {
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "employeeId",
+                message: "Enter the ID of the employee whose role you wish to update"
+            },
+            {
+                type: "input",
+                name: "roleId",
+                message: "Please enter the ID for the role you wish to move the employee to"
+            },
+            {
+                type: "input",
+                name: "managerId",
+                message: "Please enter the ID of the employee's new manager"
+            }
+        ]).then(function(ans) {
+            if (ans.managerId === "") {
+                ans.managerId = undefined
+            }
+            connection.query("UPDATE employee SET ? WHERE ?", [
+                    {
+                        role_id: ans.roleId,
+                        manager_id: ans.managerId
+                    },
+                    {
+                        id: ans.employeeId
+                    }
+                ], function(err, res) {
+                    if (err) throw err
+                    console.log(res.affectedRows + " employee updated! \n")
+                    topMenu()
             })
         })
     }
