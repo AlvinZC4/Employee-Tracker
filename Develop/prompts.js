@@ -107,11 +107,10 @@ const initApp = function (connection) {
 
     // Use ansychronus function to create an array containing department names to use as a list of possible choices in inquirer
     let depts = await getDept();
+    console.log("depts = ", depts)
     let deptNames = [];
-    for (let i = 0; i < depts.length; i++) {
-      deptNames.push(depts[i].name);
-    }
-
+    deptNames = depts.map((dept) => dept.name) 
+    console.log(deptNames)
     inquirer
       .prompt([
         {
@@ -156,37 +155,51 @@ const initApp = function (connection) {
 
     // Use a for loop to create an array that contains only role titles by looping through the roles array
     let roleNames = [];
-    for (let i = 0; i < roles.length; i++) {
-      roleNames.push(roles[i].title);
-    }
+    // for (let i = 0; i < roles.length; i++) {
+    //   roleNames.push(roles[i].title);
+    // }
+    roleNames = roles.map((role) => role.title)
+    console.log("roleNames = ", roleNames)
 
     // Create an array using an ansynchronus function that will contain all employee objects
     let allEmployees = await getEmployee();
 
     // Loop through roles array and find any role object where "manager" is in the title and push those roles into the managerRoles array. The managerRoles array only contains management roles.
     let managerRoles = [];
-    for (let i = 0; i < roles.length; i++) {
-      if (roles[i].title.toLowerCase().includes("manager")) {
-        managerRoles.push(roles[i]);
-      }
-    }
+    // for (let i = 0; i < roles.length; i++) {
+    //   if (roles[i].title.toLowerCase().includes("manager")) {
+    //     managerRoles.push(roles[i]);
+    //   }
+    // }
+    managerRoles = roles.filter((role) => role.title.toLowerCase().includes("manager"))
+    console.log("managerRoles = ", managerRoles)
 
     // Nested for loop; if the role_id property of an employee object is equal to the id property of any role object in the managerRoles array then push the employee object into the allManagers array. The allManagers array will only contain employees who are managers.
     let allManagers = [];
-    for (let i = 0; i < allEmployees.length; i++) {
+    // for (let i = 0; i < allEmployees.length; i++) {
+    //   for (let j = 0; j < managerRoles.length; j++) {
+    //     if (allEmployees[i].role_id === managerRoles[j].id) {
+    //       allManagers.push(allEmployees[i]);
+    //     }
+    //   }
+    // }
+    allManagers = allEmployees.filter((employee => {
       for (let j = 0; j < managerRoles.length; j++) {
-        if (allEmployees[i].role_id === managerRoles[j].id) {
-          allManagers.push(allEmployees[i]);
+        if (employee.role_id === managerRoles[j].id) {
+          return employee
         }
       }
-    }
+    }))
+    console.log("allManagers = ", allManagers)
 
     // For loop that concatenates the first_name and last_name property of each employee object and pushes them into an array. This will be used to generate list of choices for the manager of the new employee that is being created.
     let managerNames = [];
-    for (let i = 0; i < allManagers.length; i++) {
-      let fullName = allManagers[i].first_name + " " + allManagers[i].last_name;
-      managerNames.push(fullName);
-    }
+    // for (let i = 0; i < allManagers.length; i++) {
+    //   let fullName = allManagers[i].first_name + " " + allManagers[i].last_name;
+    //   managerNames.push(fullName);
+    // }
+    managerNames = allManagers.map((manager) => manager.first_name + " " + manager.last_name)
+    console.log("managerNames = ", managerNames)
 
     // Push an additional option that allows for the new employee not to have a manager.
     managerNames.push("This employee will not have a manager");
@@ -296,3 +309,5 @@ const initApp = function (connection) {
 };
 
 module.exports = initApp;
+
+
