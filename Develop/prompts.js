@@ -51,7 +51,6 @@ const initApp = function (connection) {
           connection.query("SELECT * FROM department", function (err, res) {
             if (err) throw err;
             console.table(res);
-            // console.log(res[0].name)
             topMenu();
           });
         } else if (ans.menu === "View Roles") {
