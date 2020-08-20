@@ -105,12 +105,15 @@ const initApp = function (connection) {
   const addRole = async () => {
     console.log("Add a role");
 
-    // Use ansychronus function to create an array containing department names to use as a list of possible choices in inquirer
+    // Use ansychronus function to create an array containing all department objects
+
     let depts = await getDept();
-    console.log("depts = ", depts)
+
+    // Map depts array to return an array containing only department names
+
     let deptNames = [];
     deptNames = depts.map((dept) => dept.name) 
-    console.log(deptNames)
+    
     inquirer
       .prompt([
         {
@@ -151,38 +154,27 @@ const initApp = function (connection) {
     console.log("Add an employee");
 
     // Create an array using an asynchronus function that will contain all role objects
+
     let roles = await getRole();
 
-    // Use a for loop to create an array that contains only role titles by looping through the roles array
+    // Map roles array to create the roleNames array containing only role tiles
+
     let roleNames = [];
-    // for (let i = 0; i < roles.length; i++) {
-    //   roleNames.push(roles[i].title);
-    // }
     roleNames = roles.map((role) => role.title)
-    console.log("roleNames = ", roleNames)
 
     // Create an array using an ansynchronus function that will contain all employee objects
+
     let allEmployees = await getEmployee();
 
-    // Loop through roles array and find any role object where "manager" is in the title and push those roles into the managerRoles array. The managerRoles array only contains management roles.
-    let managerRoles = [];
-    // for (let i = 0; i < roles.length; i++) {
-    //   if (roles[i].title.toLowerCase().includes("manager")) {
-    //     managerRoles.push(roles[i]);
-    //   }
-    // }
-    managerRoles = roles.filter((role) => role.title.toLowerCase().includes("manager"))
-    console.log("managerRoles = ", managerRoles)
+    // Filter roles array to return only manager roles into the managerRoles array
 
-    // Nested for loop; if the role_id property of an employee object is equal to the id property of any role object in the managerRoles array then push the employee object into the allManagers array. The allManagers array will only contain employees who are managers.
+    let managerRoles = [];
+    managerRoles = roles.filter((role) => role.title.toLowerCase().includes("manager"))
+
+    // Filter through allEmployees array to return only employees who are managers; accomplished by using for loop to check if
+    // role_id property of each employee matches the id property of any of the roles in the managerRoles array.
+
     let allManagers = [];
-    // for (let i = 0; i < allEmployees.length; i++) {
-    //   for (let j = 0; j < managerRoles.length; j++) {
-    //     if (allEmployees[i].role_id === managerRoles[j].id) {
-    //       allManagers.push(allEmployees[i]);
-    //     }
-    //   }
-    // }
     allManagers = allEmployees.filter((employee => {
       for (let j = 0; j < managerRoles.length; j++) {
         if (employee.role_id === managerRoles[j].id) {
@@ -190,18 +182,14 @@ const initApp = function (connection) {
         }
       }
     }))
-    console.log("allManagers = ", allManagers)
 
-    // For loop that concatenates the first_name and last_name property of each employee object and pushes them into an array. This will be used to generate list of choices for the manager of the new employee that is being created.
+    // Map allManagers array to return an array that contains first and last name of each manager.
+
     let managerNames = [];
-    // for (let i = 0; i < allManagers.length; i++) {
-    //   let fullName = allManagers[i].first_name + " " + allManagers[i].last_name;
-    //   managerNames.push(fullName);
-    // }
     managerNames = allManagers.map((manager) => manager.first_name + " " + manager.last_name)
-    console.log("managerNames = ", managerNames)
 
     // Push an additional option that allows for the new employee not to have a manager.
+
     managerNames.push("This employee will not have a manager");
 
     inquirer
@@ -231,13 +219,17 @@ const initApp = function (connection) {
       ])
       .then(function (ans) {
 
-        // Use the user response from inquirer to find the index of the string in the roleNames array that was used to generate the list of choices in inquirer
+        // Use the user response from inquirer to find the index of the string in the roleNames array that was used to
+        // generate the list of choices in inquirer
+
         let roleIndex = roleNames.indexOf(ans.roleId);
 
         // Same as above, but from the managerId response in inquirer for the managerNames array
+
         let managerIndex = managerNames.indexOf(ans.managerId);
 
         // If the user selected for the new employee to not have a manager then the value we return to mysql needs to be undefined
+
         let managerIdAnswer;
         if (ans.managerId === "This employee will not have a manager") {
           managerIdAnswer = undefined;
@@ -261,39 +253,98 @@ const initApp = function (connection) {
         );
       });
   };
-  const updateEmployee = () => {
+  const updateEmployee = async () => {
+    console.log("update an employee")
+
+    // Create an array using an asynchronus function that will contain all role objects
+
+    let roles = await getRole();
+
+    // Map roles array to create the roleNames array containing only role tiles
+
+    let roleNames = [];
+    roleNames = roles.map((role) => role.title)
+
+    // Create an array using an ansynchronus function that will contain all employee objects
+
+    let allEmployees = await getEmployee();
+
+    // Map allEmployees array to create an array containing first and last name of all employees
+
+    let allEmployeeNames = []
+    allEmployeeNames = allEmployees.map((employee) => employee.first_name + " " + employee.last_name)
+
+    // Filter roles array to return only manager roles into the managerRoles array
+
+    let managerRoles = [];
+    managerRoles = roles.filter((role) => role.title.toLowerCase().includes("manager"))
+
+    // Filter through allEmployees array to return only employees who are managers; accomplished by using for loop to check if
+    // role_id property of each employee matches the id property of any of the roles in the managerRoles array.
+
+    let allManagers = [];
+    allManagers = allEmployees.filter((employee => {
+      for (let j = 0; j < managerRoles.length; j++) {
+        if (employee.role_id === managerRoles[j].id) {
+          return employee
+        }
+      }
+    }))
+
+    // Map allManagers array to return an array that contains first and last name of each manager.
+
+    let managerNames = [];
+    managerNames = allManagers.map((manager) => manager.first_name + " " + manager.last_name)
+
+    // Push an additional option that allows for the new employee not to have a manager.
+
+    managerNames.push("This employee will not have a manager");
+    
+
     inquirer
       .prompt([
         {
-          type: "input",
+          type: "list",
           name: "employeeId",
-          message: "Enter the ID of the employee whose role you wish to update",
+          message: "Select the employee whose role you wish to update",
+          choices: allEmployeeNames
         },
         {
-          type: "input",
+          type: "list",
           name: "roleId",
-          message:
-            "Please enter the ID for the role you wish to move the employee to",
+          message: "Select this employee's new role",
+          choices: roleNames
         },
         {
-          type: "input",
+          type: "list",
           name: "managerId",
-          message: "Please enter the ID of the employee's new manager",
+          message: "Select the employee's new manager",
+          choices: managerNames
         },
       ])
       .then(function (ans) {
-        if (ans.managerId === "") {
-          ans.managerId = undefined;
+
+        employeeIndex = allEmployeeNames.indexOf(ans.employeeId)
+        roleIndex = roleNames.indexOf(ans.roleId)
+        managerIndex = managerNames.indexOf(ans.managerId)
+
+        // If the user selected for the new employee to not have a manager then the value we return to mysql needs to be undefined
+
+        let managerIdAnswer;
+        if (ans.managerId === "This employee will not have a manager") {
+          managerIdAnswer = undefined;
+        } else {
+          managerIdAnswer = allManagers[managerIndex].id;
         }
         connection.query(
           "UPDATE employee SET ? WHERE ?",
           [
             {
-              role_id: ans.roleId,
-              manager_id: ans.managerId,
+              role_id: roles[roleIndex].id,
+              manager_id: managerIdAnswer,
             },
             {
-              id: ans.employeeId,
+              id: allEmployees[employeeIndex].id,
             },
           ],
           function (err, res) {
