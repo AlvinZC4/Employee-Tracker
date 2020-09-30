@@ -23,7 +23,7 @@
 
   ## How to Use This Application
 
-  use node to run the server.js file. The user will receive prompts that will allow them to view all departments, roles, and employees in the company, to create a new department, role, or employee, or to update an employee's information.
+  Use node to run the server.js file. The user will receive prompts that will allow them to view all departments, roles, and employees in the company; or to create a new department, role, or employee, or to update an employee's information.
 
   ![Employee Tracker in action](/Assets/images/Employee_Tracker.png)
   
