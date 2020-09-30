@@ -29,7 +29,7 @@
   
   When creating or modifying a new entry into one of the tables the user will be given some prompts that require either input to be typed or to be selected from a list.  
   
-  If the user selects to view all employees, roles, or departments they will be presented with a table that contains all the data linked to their query.
+  If the user selects to view all employees, roles, or departments they will be presented with a table that contains all of the requested data linked to their query.
 
   ## Test Code
 
