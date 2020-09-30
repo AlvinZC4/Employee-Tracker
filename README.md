@@ -19,7 +19,7 @@
 
   ## Installation
 
-  Run npm install on the server.js file to download the dependencies necessary for this application to run.
+  Clone the Employee Tracker respository from the application's author's GitHub page (given below). Run npm install on the server.js file to download the dependencies necessary for this application to run.
 
   ## How to Use This Application
 
