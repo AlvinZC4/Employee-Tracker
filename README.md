@@ -24,6 +24,8 @@
   ## How to Use This Application
 
   use node to run the server.js file. The user will receive prompts that will allow them to view all departments, roles, and employees in the comapny, to create a new department, role, or employee, or to update an employee's information.
+
+  ![Employee Tracker in action](/Assets/images/Employee_Tracker.png)
   
   When creating or modifying a new entry into one of the tables the user will be given some prompts that require either input to be typed or to be selected from a list.  
   
